@@ -212,7 +212,7 @@ function scriptDelete
 	echo "Удаление USB-Storage Reconnect..."
 	scheduleDelete
 	messageBox "Скрипт - удалён."
-	rm -rf /opt/bin/usr-setup
+	rm -rf /opt/bin/usr-script
 	}
 
 function mainMenu
