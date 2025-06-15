@@ -319,7 +319,22 @@ keenetic
 </details>
 </details>
 
-## Usr (USB-Storage Reconnect)
+## ATA (Add Test Alias)
+Добавляет псевдонимы для синхронизации выбранного файла во временную папку и его выполнения...
+
+Для того чтобы начать пользоваться USr - достаточно скопировать и вставить в терминал, следующие несколько команд:
+
+```
+opkg update
+opkg install ca-certificates wget-ssl
+opkg remove wget-nossl
+wget -q -O /opt/bin/ata-setup https://raw.githubusercontent.com/Neytrino-OnLine/usefull-things/refs/heads/main/ATA/ata.sh
+chmod +x /opt/bin/ata-setup
+ata-setup
+
+```
+
+## USr (USB-Storage Reconnect)
 Позволяет настроить проверку доступности USB-накопителя, и переподключить его (если он не доступен)...
 
 Для того чтобы начать пользоваться USr - достаточно скопировать и вставить в терминал, следующие несколько команд:
