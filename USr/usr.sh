@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION="beta 2"
-BUILD='0729.2'
+BUILD='0729.3'
 CRON_FILE='/opt/var/spool/cron/crontabs/root'
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
@@ -208,7 +208,7 @@ function scriptSetup
 		messageBox "Порт не выбран." "\033[91m"
 		exit
 	fi
-	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\n\techo \"\`date +\"%C%y.%m.%d %H:%M:%S\"\` - выполнено переподключение накопителя.\" >> $LOG\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr-script
+	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\n\tsleep 10\n\techo \"\`date +\"%C%y.%m.%d %H:%M:%S\"\` - выполнено переподключение накопителя.\" >> $LOG\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr-script
 	chmod +x /opt/bin/usr-script
 	scheduleAdd
 	messageBox "Настройка завершена."
