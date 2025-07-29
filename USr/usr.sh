@@ -1,6 +1,7 @@
 #!/bin/sh
 
 VERSION="beta 2"
+BUILD='0729.1'
 CRON_FILE='/opt/var/spool/cron/crontabs/root'
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
@@ -45,31 +46,6 @@ function headLine	#1 - заголовок	#2 - скрыть полосу под 
 	fi
 	}
 
-function messageBox	#1 - текст	#2 - цвет
-	{
-	local TEXT=$1
-	local COLOR=$2
-	local LONG=`echo ${#TEXT}`
-	if [ ! "$LONG" -gt "`expr $COLUNS - 4`" ];then
-		local TEXT="│ $TEXT │"
-		local SIZE=`expr $COLUNS - $LONG - 4`
-		local SIZE=`expr $SIZE / 2`
-		local SPACE=`awk -v i=$SIZE 'BEGIN { OFS=" "; $i=" "; print }'`
-	else
-		local LONG=`expr $COLUNS - 4`
-		local SPACE=""
-	fi
-	if [ "$COLUNS" = "80" ];then
-		echo -e "$COLOR$SPACE┌─`awk -v i=$LONG 'BEGIN { OFS="─"; $i="─"; print }'`─┐\033[39m\033[49m"
-		echo -e "$COLOR$SPACE$TEXT\033[39m\033[49m"
-		echo -e "$COLOR$SPACE└─`awk -v i=$LONG 'BEGIN { OFS="─"; $i="─"; print }'`─┘\033[39m\033[49m"
-	else
-		echo -e "$COLOR$SPACE□-`awk -v i=$LONG 'BEGIN { OFS="-"; $i="-"; print }'`-□\033[39m\033[49m"
-		echo -e "$COLOR$SPACE$TEXT\033[39m\033[49m"
-		echo -e "$COLOR$SPACE□-`awk -v i=$LONG 'BEGIN { OFS="-"; $i="-"; print }'`-□\033[39m\033[49m"
-	fi
-	}
-
 function showText	#1 - текст	#2 - цвет
 	{
 	local TEXT=`echo "$1" | awk '{gsub(/\\\t/,"____")}1'`
@@ -89,6 +65,41 @@ function showText	#1 - текст	#2 - цвет
 			fi
 	done
 	echo -e "$2$STRING\033[39m\033[49m" | awk '{gsub(/____/,"    ")}1'
+	}
+
+function messageBox	#1 - текст	#2 - цвет
+	{
+	local TEXT=$1
+	local COLOR=$2
+	local LONG=`echo ${#TEXT}`
+	if [ ! "$LONG" -gt "`expr $COLUNS - 4`" ];then
+		local TEXT="│ $TEXT │"
+		local LONG=`echo ${#TEXT}`
+		local SIZE=`expr $COLUNS - $LONG`
+		local SIZE=`expr $SIZE / 2`
+		local SPACE=`awk -v i=$SIZE 'BEGIN { OFS=" "; $i=" "; print }'`
+		local LONG=`expr $LONG - 4`
+		local LEFT_UP='┌'
+		local RIGHT_UP='┐'
+		local LEFT_DOWN='└'
+		local RIGHT_DOWN='┘'
+	else
+		local LONG=`expr $COLUNS - 4`
+		local SPACE=""
+		local LEFT_UP='□'
+		local RIGHT_UP='□'
+		local LEFT_DOWN='□'
+		local RIGHT_DOWN='□'
+	fi
+	if [ "$COLUNS" = "80" ];then
+		echo -e "$COLOR$SPACE$LEFT_UP─`awk -v i=$LONG 'BEGIN { OFS="─"; $i="─"; print }'`─$RIGHT_UP\033[39m\033[49m"
+		echo -e "$COLOR$SPACE$TEXT\033[39m\033[49m"
+		echo -e "$COLOR$SPACE$LEFT_DOWN─`awk -v i=$LONG 'BEGIN { OFS="─"; $i="─"; print }'`─$RIGHT_DOWN\033[39m\033[49m"
+	else
+		echo -e "$COLOR$SPACE□-`awk -v i=$LONG 'BEGIN { OFS="-"; $i="-"; print }'`-□\033[39m\033[49m"
+		echo -e "$COLOR$SPACE$TEXT\033[39m\033[49m"
+		echo -e "$COLOR$SPACE□-`awk -v i=$LONG 'BEGIN { OFS="-"; $i="-"; print }'`-□\033[39m\033[49m"
+	fi
 	}
 
 function copyRight	#1 - название	#2 - год
@@ -148,13 +159,14 @@ function scriptSetup
 	REPLY=`echo "$STORAGES" | grep "^\$REPLY:"`
 	if [ -n "$REPLY" ];then
 		STORAGE=`echo "$REPLY" | awk -F"\t" '{print $2}'`
+		LOG=`echo "$REPLY" | awk -F"\t" '{print $2"/usr-log.txt"}'`
 	else
-		messageBox "Накопитель - не выбран." "\033[91m"
+		messageBox "Накопитель не выбран." "\033[91m"
 		exit
 	fi
 	LIST=`ls /tmp/mnt/$STORAGE`
 	if [ -z "$LIST" ];then
-		messageBox "На накопителе - отсутствуют файлы и папки." "\033[91m"
+		messageBox "На накопителе отсутствуют файлы и папки." "\033[91m"
 		exit
 	fi
 	TARGETS=`echo "$LIST" | awk '{print NR":\t"$0}'`
@@ -170,7 +182,7 @@ function scriptSetup
 	if [ -n "$REPLY" ];then
 		TARGET='/tmp/mnt/'$STORAGE/`echo "$REPLY" | awk -F"\t" '{print $2}'`
 	else
-		messageBox "Файл или папка - не выбран." "\033[91m"
+		messageBox "Файл или папка - не выбран(а)." "\033[91m"
 		exit
 	fi
 	LIST=`ndmc -c show usb | grep 'device: \|manufacturer: \|product: \|port: ' | sed -e "s/device: /device: @@/g; s/manufacturer: /manufacturer:  m=/g; s/product: /product: p=/g; s/port: /port: u=/g" | awk -F": " '{print $2}' | tr '\n' '\t' | sed -e "s/@@/\\n/g" | grep -v '^$'`
@@ -193,10 +205,10 @@ function scriptSetup
 	if [ -n "$REPLY" ];then
 		PORT=`echo "$REPLY" | awk -F"\t" '{print $4}'`
 	else
-		messageBox "Порт - не выбран." "\033[91m"
+		messageBox "Порт не выбран." "\033[91m"
 		exit
 	fi
-	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr-script
+	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\n\techo \"`date +"%C%y.%m.%d %H:%M:%S"` - выполнено переподключение накопителя.\" >> $LOG\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr-script
 	chmod +x /opt/bin/usr-script
 	scheduleAdd
 	messageBox "Настройка завершена."
@@ -252,6 +264,10 @@ case "$1" in
 
 -s)	headLine "USB-Storage Reconnect"
 	scriptSetup
+	exit
+	;;
+
+-v)	echo "$0 $VERSION build $BUILD"
 	exit
 	;;
 
