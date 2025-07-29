@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION="beta 2"
-BUILD='0729.4'
+BUILD='0729.5'
 CRON_FILE='/opt/var/spool/cron/crontabs/root'
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
@@ -159,7 +159,7 @@ function scriptSetup
 	REPLY=`echo "$STORAGES" | grep "^\$REPLY:"`
 	if [ -n "$REPLY" ];then
 		STORAGE=`echo "$REPLY" | awk -F"\t" '{print $2}'`
-		LOG=`echo "$REPLY" | awk -F"\t" '{print "/tmp/"$2"/usr-log.txt"}'`
+		LOG=`echo "$REPLY" | awk -F"\t" '{print "/tmp/mnt/"$2"/usr-log.txt"}'`
 	else
 		messageBox "Накопитель не выбран." "\033[91m"
 		exit
