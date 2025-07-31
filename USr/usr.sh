@@ -1,8 +1,8 @@
 #!/bin/sh
 
 VERSION="beta 2"
-BUILD='0729.5'
-CRON_FILE='/opt/var/spool/cron/crontabs/root'
+BUILD="0731.1"
+CRON_FILE="/opt/var/spool/cron/crontabs/root"
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
 function headLine	#1 - заголовок	#2 - скрыть полосу под заголовком	#3 - добавить пустые строки для прокрутки
@@ -120,20 +120,23 @@ function scheduleAdd
 		fi
 		echo "" > $CRON_FILE
 	fi
-	if [ -n "`cat $CRON_FILE | grep "usr-script"`" ];then
-		local LIST="`cat $CRON_FILE | grep -v "usr-script"`"
+	if [ -n "`cat $CRON_FILE | grep "usr"`" ];then
+		local LIST="`cat $CRON_FILE | grep -v "usr" | grep -v '^$'`"
 		echo "$LIST" > $CRON_FILE
 	fi
-	echo '0,10,20,30,40,50 */1 * * * usr-script' >> $CRON_FILE
-	echo "`killall crond`" > /dev/null
-	echo "`crond`" > /dev/null
+	echo '0,10,20,30,40,50 */1 * * * root /opt/bin/usr
+	' >> $CRON_FILE
+	/opt/etc/init.d/S10cron stop
+	#echo "`killall crond`" > /dev/null
+	/opt/etc/init.d/S10cron start
+	#echo "`crond`" > /dev/null
 	echo ""
 	}
 
 function scheduleDelete
 	{
-	if [ -n "`cat $CRON_FILE | grep "usr-script"`" ];then
-		local LIST="`cat $CRON_FILE | grep -v "usr-script"`"
+	if [ -n "`cat $CRON_FILE | grep "usr"`" ];then
+		local LIST="`cat $CRON_FILE | grep -v "usr"`"
 		echo "$LIST" > $CRON_FILE
 	fi
 	echo "`killall crond`" > /dev/null
@@ -208,8 +211,8 @@ function scriptSetup
 		messageBox "Порт не выбран." "\033[91m"
 		exit
 	fi
-	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\n\tsleep 10\n\techo \"\`date +\"%C%y.%m.%d %H:%M:%S\"\` - выполнено переподключение накопителя.\" >> $LOG\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr-script
-	chmod +x /opt/bin/usr-script
+	echo -e "#!/bin/sh\n\nif [ ! -f \"$TARGET\" -a ! -d \"$TARGET\" ];then\n\tndmc -c no system mount $STORAGE:\n\tsleep 15\n\tndmc -c system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c no system usb $PORT power shutdown\n\tsleep 15\n\tndmc -c system mount $STORAGE:\n\tlogger \"USr: выполнено переподключение накопителя.\"\n\tsleep 10\n\techo \"\`date +\"%C%y.%m.%d %H:%M\"\` - выполнено переподключение накопителя.\" >> $LOG\nelse\n\tlogger \"USr: накопитель - доступен.\"\nfi" > /opt/bin/usr
+	chmod +x /opt/bin/usr
 	scheduleAdd
 	messageBox "Настройка завершена."
 	echo ""
@@ -224,13 +227,14 @@ function scriptDelete
 	echo "Удаление USB-Storage Reconnect..."
 	scheduleDelete
 	messageBox "Скрипт - удалён."
+	rm -rf /opt/bin/usr
 	rm -rf /opt/bin/usr-script
 	}
 
 function mainMenu
 	{
 	headLine "USB-Storage Reconnect"
-	if [ -f "/opt/bin/usr-script" ];then
+	if [ -f "/opt/bin/usr" ];then
 			showText "\tОбнаружен настроенный скрипт."
 			echo ""
 			echo -e "\t1: Новая конфигурация"
