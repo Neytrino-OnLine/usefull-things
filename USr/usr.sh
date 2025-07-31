@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION="beta 2"
-BUILD="0731.1"
+BUILD="0731.2"
 CRON_FILE="/opt/var/spool/cron/crontabs/root"
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
@@ -124,9 +124,9 @@ function scheduleAdd
 		local LIST="`cat $CRON_FILE | grep -v "usr" | grep -v '^$'`"
 		echo "$LIST" > $CRON_FILE
 	fi
-	echo '0,10,20,30,40,50 */1 * * * root /opt/bin/usr
-	' >> $CRON_FILE
+	echo "0,10,20,30,40,50 */1 * * * /opt/bin/usr\n" >> $CRON_FILE
 	/opt/etc/init.d/S10cron stop
+	chmod +rwx $CRON_FILE
 	#echo "`killall crond`" > /dev/null
 	/opt/etc/init.d/S10cron start
 	#echo "`crond`" > /dev/null
