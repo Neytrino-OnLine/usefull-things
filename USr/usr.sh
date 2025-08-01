@@ -126,7 +126,7 @@ function scheduleAdd
 	rm -rf $CRON_FILE
 	echo "$LIST" > $CRON_FILE
 	echo -e "*/$PERIOD */1 * * * usr\n" >> $CRON_FILE
-	#chmod +rwx $CRON_FILE
+	chmod +rw $CRON_FILE
 	}
 
 function scheduleDelete
@@ -136,7 +136,7 @@ function scheduleDelete
 		rm -rf $CRON_FILE
 		echo "$LIST" > $CRON_FILE
 		echo -e "\n" >> $CRON_FILE
-		#chmod +rwx $CRON_FILE
+		chmod +rw $CRON_FILE
 	fi
 	}
 
