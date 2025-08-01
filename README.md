@@ -343,8 +343,8 @@ ata-setup
 opkg update
 opkg install ca-certificates wget-ssl
 opkg remove wget-nossl
-wget -q -O /opt/bin/usr-setup https://raw.githubusercontent.com/Neytrino-OnLine/usefull-things/refs/heads/main/USr/usr.sh
-chmod +x /opt/bin/usr-setup
-usr-setup
+wget -q -O /tmp/usr https://raw.githubusercontent.com/Neytrino-OnLine/usefull-things/refs/heads/main/USr/usr.sh
+chmod +x /tmp/usr
+/tmp/usr
 
 ```
