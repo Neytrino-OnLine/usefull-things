@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION="beta 2"
-BUILD="0801.x1"
+BUILD="0801.x2"
 CRON_FILE="/opt/var/spool/cron/crontabs/root"
 COLUNS="`stty -a | awk -F"; " '{print $3}' | grep "columns" | awk -F" " '{print $2}'`"
 
@@ -123,11 +123,12 @@ function scheduleAdd
 		echo "" > $CRON_FILE
 	fi
 	local LIST="`cat $CRON_FILE | grep -v 'usr\|^$'`"
-	rm -rf $CRON_FILE
+	#rm -rf $CRON_FILE
 	echo "$LIST" > $CRON_FILE
 	echo -e "*/$PERIOD */1 * * * usr\n" >> $CRON_FILE
 	chmod 0600 $CRON_FILE
 	chgrp root $CRON_FILE
+	touch $CRON_FILE
 	#chmod +rwx $CRON_FILE
 	}
 
@@ -135,11 +136,12 @@ function scheduleDelete
 	{
 	if [ -n "`cat $CRON_FILE | grep "usr"`" ];then
 		local LIST="`cat $CRON_FILE | grep -v 'usr\|^$'`"
-		rm -rf $CRON_FILE
+		#rm -rf $CRON_FILE
 		echo "$LIST" > $CRON_FILE
 		echo -e "\n" >> $CRON_FILE
 		chmod 0600 $CRON_FILE
 		chgrp root $CRON_FILE
+		touch $CRON_FILE
 		#chmod +rwx $CRON_FILE
 	fi
 	}
