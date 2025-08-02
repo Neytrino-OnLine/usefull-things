@@ -125,7 +125,7 @@ function scheduleAdd
 	local LIST="`cat $CRON_FILE | grep -v 'usr\|^$'`"
 	#rm -rf $CRON_FILE
 	echo "$LIST" > $CRON_FILE
-	echo '*/$PERIOD */1 * * * /opt/bin/usr' >> $CRON_FILE
+	echo "*/$PERIOD */1 * * * /opt/bin/usr" >> $CRON_FILE
 	echo "" >> $CRON_FILE
 	#0600
 	chmod 644 $CRON_FILE
