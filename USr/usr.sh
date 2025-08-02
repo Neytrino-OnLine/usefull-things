@@ -125,8 +125,10 @@ function scheduleAdd
 	local LIST="`cat $CRON_FILE | grep -v 'usr\|^$'`"
 	#rm -rf $CRON_FILE
 	echo "$LIST" > $CRON_FILE
-	echo -e "*/$PERIOD */1 * * * /opt/bin/usr >> /tmp/crt\n" >> $CRON_FILE
-	chmod 0600 $CRON_FILE
+	echo '*/$PERIOD */1 * * * /opt/bin/usr' >> $CRON_FILE
+	echo "" >> $CRON_FILE
+	#0600
+	chmod 644 $CRON_FILE
 	chgrp root $CRON_FILE
 	touch $CRON_FILE
 	#chmod +rwx $CRON_FILE
@@ -138,8 +140,7 @@ function scheduleDelete
 		local LIST="`cat $CRON_FILE | grep -v 'usr\|^$'`"
 		#rm -rf $CRON_FILE
 		echo "$LIST" > $CRON_FILE
-		echo -e "\n" >> $CRON_FILE
-		chmod 0600 $CRON_FILE
+		chmod 644 $CRON_FILE
 		chgrp root $CRON_FILE
 		touch $CRON_FILE
 		#chmod +rwx $CRON_FILE
